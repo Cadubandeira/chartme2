@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loader"></div>
+    </div>
+    <div class="container">
+        <div id="email-form" class="form-step">
+            <h1>Bem-vindo(a)</h1>
+<br>
+                      <form id="login-form" class="form-step">
+                 <div class="outlined-input-container">
+                    <input type="email" id="login-email" placeholder=" " required>
+                    <label for="login-email">Digite seu e-mail</label>
+                </div>
+                <div class="outlined-input-container">
+                     <input type="password" id="login-password" placeholder=" " required>
+                    <label for="login-password">Digite sua senha</label>
+                </div>
+                 <div id="snackbar"></div>
+                <span id="email-error" class="error-message hidden">Por favor, digite seu e-mail e senha</span>
+                <button type="submit">Entrar</button>
+                <p>Não tem uma conta? <a href="register.html" style="color: blue; text-decoration: underline;">Criar conta</a></p>
+            </form>
+        </div>
+        <div id="message"></div>
+
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="script.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+          const body = document.body;
+        body.classList.add('gradient-1'); // set initial gradient
+        document.getElementById('login-email').addEventListener('input', hideSnackbar);
+        document.getElementById('login-password').addEventListener('input', hideSnackbar);
+    });
+</script>
+</body>
+</html>

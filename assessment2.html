@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMP - Índice de Magnetismo Pessoal</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script type=module src="pdf-generator.js"></script>
+    <script type=module src="assessment2.js"></script>
+    <script src="assessment_helper.js"></script>
+    <script>
+
+        async function handleLogout() {
+            try {
+                await auth.signOut();
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.log(error.message);
+            }
+        }
+
+        async function handleHome() {
+            try {
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                console.log(error.message);
+            }
+        }
+
+        const saveAssessment = async (assessmentName, result, resultInterpretation, answers) => { // Add answers parameter
+    const user = auth.currentUser;
+    if (user) {
+        try {
+            await db.collection("assessmentHistory").add({
+                userId: user.uid,
+                assessmentName: assessmentName,
+                result: result,
+                resultInterpretation: resultInterpretation,
+                answers: answers, // Save the answers
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() // Save the server timestamp
+            });
+            console.log("Assessment saved successfully!");
+        } catch (error) {
+            console.error("Error saving assessment: ", error);
+        }
+    } else {
+        console.log("User is not logged in.");
+    }
+}
+    </script>
+
+</head>
+<body>
+     <div class="loading-overlay" id="loading-overlay">
+         <div class="loader"></div>
+        <p id="loading-message" class="loading-message"></p>
+     </div>
+
+    <div id="menu-button-container">
+        <button id="menu-icon-button" onclick="handleHome()"  style="position:absolute; top:24px; left:24px;">
+            <i class="material-icons">home</i>
+        </button>
+    </div>
+
+    <div id="logout-button-container">
+        <button id="logout-icon-button" onclick="handleLogout()" style="position:absolute; top:24px; right:24px;">
+            <i class="material-icons">logout</i>
+        </button>
+    </div>
+
+    <div class="container">
+
+        <div id="test-container" class="form-step hidden">
+            <h3 id="section-title"></h3>
+            <p id="section-instruction"></p>
+            <h3 id="question-number"></h3>
+            <h3 id="question-text" style="font-size:1.1em;"></h3>
+             <div id="answers-wrapper">
+                <div id="answer-options"></div>
+                <span id="answer-error" class="error-message hidden">Por favor, escolha uma opção para continuar</span>
+            </div>
+            <button onclick="nextQuestion()">Continuar</button>
+        </div>
+
+        <div id="results-container" class="form-step hidden">
+           <h2 id="final-message-title"></h2>
+             <p id="final-message"></p>
+                           <canvas id="radarChart"    width: 100%; max-width: 600px; height: auto; display: flex; justify-content: center;align-items: center;"></canvas>
+             <h2 id="total-result-title"></h2>
+             <p id="total-result" style="font-weight: 600;"></p>
+             <p id="total-result-interpretation"></p>
+            <div id="section-results">
+            </div>
+		    <p id="final-reflection"></p>
+		    <button id="share-button" style="margin-top:32px;">Compartilhar no WhatsApp</button>
+  		<button id="save-results-button" style="margin-top:16px;">Baixar PDF</button>
+        </div>
+          <div id="initial-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2 id="assessment-title">IMP - Índice de Magnetismo Pessoal</h2>
+		    <br>
+               <h3>Instruções</h3>
+		    <p style="text-align:left; line-height:1.3em;">
+               Responda às seguintes perguntas para avaliar seu desempenho nos cinco principais atributos do networking: Agradabilidade, Expertise, Confiança, Colaboração e Visibilidade.
+		    </p>
+		    <hr class="solid">
+                <h3>Importante!</h3>
+		    <p style="text-align:left; line-height:1.3em;">
+                Responda todas as avaliações com honestidade, sendo fiel a si mesmo(a). <br>
+                Seja sincero(a) ao responder e escolha a opção que mais reflete seu comportamento e atitudes atuais. <br>
+                Não responda pensando em quem você gostaria de ser, mas sim sobre quem você é, e como pensa e age atualmente. <br>
+               Não tente analisar excessivamente as questões, racionalizar ou tentar encontrar a melhor resposta. Ela não existe !! Não há resposta certa ou melhor, e ninguém irá julgá-lo(a) pelas suas respostas. <br>
+               Seja você mesmo(a). Siga seu coração e seja espontâneo(a): escolha a afirmação que mais se aproxima de você, e não de quem você (pensa que) desejaria ser.
+		    </p>
+               <div class="modal-buttons">
+                   <button id="start-test-button">Começar</button>
+               </div>
+            </div>
+          </div>
+    </div>
+
+
+
+
+</body>
+</html>
